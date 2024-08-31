@@ -10,7 +10,8 @@ dependencies = [
     "seaborn>=0.13.2",
     "pandas>=2.2.1",
     "geopandas>=0.14.3",
-    "numpy>=1.26.4",
+    # to address bug in union https://github.com/shapely/shapely/issues/2098
+    "numpy==2.0.1",
     "cityseer>=4.13.1",
     "jupyterlab>=4.1.5",
     "ipykernel>=6.29.3",
@@ -18,6 +19,7 @@ dependencies = [
     "psycopg[binary]>=3.2.1",
     "sqlalchemy>=2.0.32",
     "pyproj>=3.6.1",
+    "osmnx>=1.9.3",
 ]
 requires-python = ">=3.11,<3.13"
 readme = "README.md"
