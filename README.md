@@ -6,11 +6,19 @@ Paper on network cleaning investigations for T2E project. Based on EU high densi
 
 Clone this repository to a local working folder.
 
-The PDM package manager is recommended and can be installed on mac per `brew install pdm`.
+A python package manager and an IDE such as `vscode` are recommended.
 
-Packages can then be installed into a virtual environment per `pdm install`.
+### UV
 
-If using an IDE the `.venv` should be detected automatically by IDEs such as vscode.
+The UV package manager can be installed on mac per `brew install uv`. Packages can then be installed into a virtual environment per `uv sync`.
+
+### PDM
+
+The PDM package manager can be installed on mac per `brew install pdm`. Packages can then be installed into a virtual environment per `pdm install`.
+
+### IDE and venv
+
+If using an IDE the `.venv` should be detected automatically by IDEs such as vscode, else activate it manually.
 
 ## Data
 
