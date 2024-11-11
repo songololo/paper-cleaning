@@ -141,7 +141,7 @@ print(f"Edges before removing green itx: {nx_copy.number_of_edges()}")
 nx_copy.remove_edges_from(remove_edges)
 print(f"Edges after removing green itx: {nx_copy.number_of_edges()}")
 _edges_gdf = io.geopandas_from_nx(nx_copy, crs=network_edges_gdf.crs.to_epsg())
-_edges_gdf.to_file("temp/osm_network_raw.gpkg")
+_edges_gdf.to_file("temp/osm_network_filt.gpkg")
 
 # %%
 # start by bridging gaps between dead-ended segments
@@ -191,10 +191,6 @@ _edges_gdf = io.geopandas_from_nx(G3, crs=network_edges_gdf.crs.to_epsg())
 _edges_gdf.to_file("temp/osm_network_3.gpkg")
 
 # %%
-import importlib
-
-importlib.reload(graphs)
-
 nx_basic_clean = graphs.nx_remove_filler_nodes(G3)
 for par_dist, tags, simplify_line_angles, cons_dist in (
     # (40, ["motorway"], False),  # does this matter in reality?  , "motorway_link"
