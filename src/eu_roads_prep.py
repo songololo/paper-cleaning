@@ -36,9 +36,9 @@ bounds_buff = bounds.buffer(10000)
 feats_gdf = ox.features_from_polygon(
     bounds_wgs,
     tags={
-        # "landuse": ["cemetery", "forest"],
-        # "leisure": ["park", "garden"],
-        "highway": ["pedestrian"],
+        "landuse": ["cemetery", "forest"],
+        "leisure": ["park", "garden"],
+        # "highway": ["pedestrian"],
     },
 )
 
@@ -58,13 +58,12 @@ combined_gdf = pd.concat([ways_gdf, relations_gdf])
 combined_geom = combined_gdf.union_all()
 # extract geoms and explode
 combined_gdf = gpd.GeoDataFrame({"geometry": [combined_geom]}, crs=combined_gdf.crs)
-exploded_gdf = combined_gdf.explode(index_parts=False).reset_index(drop=True)
-exploded_gdf = exploded_gdf[exploded_gdf.geometry.type == "Polygon"]
-exploded_gdf = exploded_gdf[~exploded_gdf.geometry.is_empty]
-exploded_gdf = exploded_gdf[exploded_gdf.geometry.is_valid]
+park_area_gdf = combined_gdf.explode(index_parts=False).reset_index(drop=True)
+park_area_gdf = park_area_gdf[park_area_gdf.geometry.type == "Polygon"]
+park_area_gdf = park_area_gdf[~park_area_gdf.geometry.is_empty]
+park_area_gdf = park_area_gdf[park_area_gdf.geometry.is_valid]
 # exploded_gdf = exploded_gdf[exploded_gdf.area >= 20000]
-exploded_gdf.to_file("temp/hwy_poly.gpkg")
-exploded_gdf_buff = exploded_gdf.buffer(5)
+park_area_gdf.to_file("temp/parks_poly.gpkg")
 
 
 # %%
@@ -112,8 +111,8 @@ nx_copy = nx_raw.copy()
 uniq_hwy_tags = set()
 remove_edges = []
 # use STR Tree for performance
-parks_index = STRtree(exploded_gdf.geometry.to_list())
-parks_buff_index = STRtree(exploded_gdf_buff.geometry.to_list())
+parks_str_tree = STRtree(park_area_gdf.geometry.to_list())
+parks_buff_str_tree = STRtree(park_area_gdf.buffer(5).geometry.to_list())
 # iter edges to find edges for removal
 for start_node_key, end_node_key, edge_data in tqdm(
     nx_copy.edges(data=True), total=nx_copy.number_of_edges()
@@ -121,18 +120,17 @@ for start_node_key, end_node_key, edge_data in tqdm(
     edge_geom = edge_data["geom"]
     # remove if footway if not itx with pedestrian poly
     if "footway" in edge_data["highways"]:  # and "pedestrian" not in edge_data["highways"]
-        itx = parks_index.query(edge_geom, predicate="intersects")
-        if not len(itx):
+        itx = parks_str_tree.query(edge_geom, predicate="within")
+        if len(itx):
             remove_edges.append((start_node_key, end_node_key))
             continue
     # e.g. cemetries
     if "service" in edge_data["highways"]:
-        itx = parks_buff_index.query(edge_geom, predicate="intersects")
-        if not len(itx):
+        itx = parks_buff_str_tree.query(edge_geom, predicate="intersects")
+        if len(itx):
             remove_edges.append((start_node_key, end_node_key))
             continue
-    if "highways" in edge_data:
-        uniq_hwy_tags.update(edge_data["highways"])
+    uniq_hwy_tags.update(edge_data["highways"])
 # report and remove
 print(f"Hwy tags: {uniq_hwy_tags}")
 print(f"Edges before removing green itx: {nx_copy.number_of_edges()}")
@@ -168,18 +166,6 @@ G2 = graphs.nx_split_opposing_geoms(
     min_node_degree=1,
     max_node_degree=1,
     squash_nodes=False,
-    osm_hwy_target_tags=[
-        "primary",
-        "primary_link",
-        "secondary",
-        "secondary_link",
-        "tertiary",
-        "tertiary_link",
-        "residential",
-        "footway",
-        "living_street",
-        "pedestrian",
-    ],
 )
 _edges_gdf = io.geopandas_from_nx(G2, crs=network_edges_gdf.crs.to_epsg())
 _edges_gdf.to_file("temp/osm_network_2.gpkg")
