@@ -25,9 +25,7 @@ bounds = bounds_gdf.geometry.iloc[0].buffer(-10000)
 
 # %%
 # raw network
-mad_nx_raw = util.osm_raw_graph_from_poly(
-    poly_geom=bounds, poly_crs_code=3035, to_crs_code=3035
-)
+mad_nx_raw = util.osm_raw_graph_from_poly(poly_geom=bounds, poly_crs_code=3035, to_crs_code=3035)
 mad_raw_gdf = io.geopandas_from_nx(mad_nx_raw, crs=3035)
 mad_raw_gdf.to_file("../temp/madrid_network_raw.gpkg")
 
