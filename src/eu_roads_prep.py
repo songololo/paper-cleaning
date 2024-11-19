@@ -34,25 +34,25 @@ bound_buff = 500
 # %%
 # relation_fid = "R2417889"
 # map_key = "barcelona"
-# relation_fid = "R5326784"
-# map_key = "madrid"
+relation_fid = "R5326784"
+map_key = "madrid"
 
 # %%
-# bounds = ox.geocode_to_gdf(
-#     relation_fid,
-#     by_osmid=True,
-# )
-# bounds = bounds.to_crs(WORKING_CRS)
-# bounds_buff = bounds.buffer(bound_buff).union_all()
-# bounds_wgs = bounds.buffer(bound_buff).to_crs(4326).union_all()
-# bounds_buff
-
-# %%
-map_key = "nicosia"
-bounds_buff = gpd.read_file("temp/Nicosia_buffer_20km.gpkg")
-bounds_wgs = bounds_buff.to_crs(4326).union_all()
-bounds_buff = bounds_buff.to_crs(WORKING_CRS).union_all()
+bounds = ox.geocode_to_gdf(
+    relation_fid,
+    by_osmid=True,
+)
+bounds = bounds.to_crs(WORKING_CRS)
+bounds_buff = bounds.buffer(bound_buff).union_all()
+bounds_wgs = bounds.buffer(bound_buff).to_crs(4326).union_all()
 bounds_buff
+
+# %%
+# map_key = "nicosia"
+# bounds_buff = gpd.read_file("temp/Nicosia_buffer_20km.gpkg")
+# bounds_wgs = bounds_buff.to_crs(4326).union_all()
+# bounds_buff = bounds_buff.to_crs(WORKING_CRS).union_all()
+# bounds_buff
 
 # %%
 # spaces for selecting / discarding
@@ -114,11 +114,7 @@ way["highway"]
 request = """
     /* https://wiki.openstreetmap.org/wiki/Overpass_API/Overpass_QL */
     [out:json];
-    (
-    way["highway"]
-        ["highway"!="footway"]
-        ["footway"="sidewalk"](poly:"{geom_osm}");
-    way["highway"]
+    (way["highway"]
         ["highway"!~"bus_guideway|busway|escape|raceway|proposed|planned|abandoned|platform|emergency_bay|rest_area|disused|path|corridor|ladder|bus_stop|elevator|services"]
         ["area"!="yes"]
         ["footway"!="sidewalk"]
@@ -139,7 +135,6 @@ nx_raw = io.osm_graph_from_poly(
     poly_crs_code=WORKING_CRS,
     to_crs_code=WORKING_CRS,
     simplify=False,
-    iron_edges=False,
     custom_request=request,
 )
 _edges_gdf = io.geopandas_from_nx(nx_raw, crs=WORKING_CRS)
