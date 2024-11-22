@@ -1,19 +1,16 @@
 # %%
 from __future__ import annotations
 
-import json
 import pathlib
 import sys
 
 import geopandas as gpd
 import matplotlib.pyplot as plt
-import pandas as pd
 import seaborn as sns
 from shapely import geometry
 
 sys.path.append(str(pathlib.Path.cwd().parent.absolute()))
 
-from src import util
 
 sns.set_theme(style="whitegrid")
 

@@ -17,8 +17,13 @@ sns.set_theme(style="whitegrid")
 WORKING_CRS = 3035
 
 # %%
-map_key = "nicosia"
-bounds_buff = gpd.read_file("data/nicosia_buffered_bounds.gpkg")
+# set city key for naming output files
+map_key = "nicosia"  # or "madrid"
+# set input path for boundary to corresponding file in data directory
+bounds_path = "data/nicosia_buffered_bounds.gpkg"  # or "data/madrid_buffered_bounds.gpkg
+
+# %%
+bounds_buff = gpd.read_file(bounds_path)
 bounds_wgs = bounds_buff.to_crs(4326).union_all()
 bounds_buff = bounds_buff.to_crs(WORKING_CRS).union_all()
 bounds_buff

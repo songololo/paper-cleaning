@@ -10,7 +10,7 @@ from shapely import geometry
 
 sys.path.append(str(pathlib.Path.cwd().parent.absolute()))
 
-from src import util
+from deprecated import util
 
 sns.set_theme(style="whitegrid")
 
@@ -51,9 +51,7 @@ def fetch_network_by_hwy_type(
     return edges_gdf
 
 
-def filter_geoms_by_size(
-    multi_geom: geometry.MultiPolygon, min_area: int
-) -> geometry.MultiPolygon:
+def filter_geoms_by_size(multi_geom: geometry.MultiPolygon, min_area: int) -> geometry.MultiPolygon:
     """ """
     filtered_geoms = [poly for poly in multi_geom.geoms if poly.area >= min_area]
     return geometry.MultiPolygon(filtered_geoms)
@@ -69,7 +67,7 @@ buff_ranges = [
     [10, 12, 14, 16, 18, 20],
     [4, 8, 12, 16, 20, 24],
 ]
-for buff_range, hwy_type in zip(buff_ranges, hwy_types):
+for buff_range, hwy_type in zip(buff_ranges, hwy_types, strict=False):
     print(f"Processing {hwy_type}:")
     # fetch network
     edges_gdf = fetch_network_by_hwy_type(hwy_type)

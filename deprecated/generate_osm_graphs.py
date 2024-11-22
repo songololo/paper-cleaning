@@ -13,7 +13,7 @@ sys.path.append(str(pathlib.Path.cwd().parent.absolute()))
 import geopandas as gpd
 from cityseer.tools import graphs, io
 
-from src import util
+from deprecated import util
 
 # %%
 # Load Madrid boundary
