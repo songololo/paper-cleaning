@@ -30,7 +30,7 @@ for osm_fid, location_key in [
     bounds_buff = bounds.buffer(buffer_dist).union_all()
 
     # Fetch the road network using Cityseer's I/O tools
-    # Recommend version 4.16.6 (or newer) for latest cleaning workflow
+    # Recommend version 4.16.10 (or newer) for latest cleaning workflow
     # The idea is then to further edit the network manually as required
     # The workflow can be customised to target specific OSM highway tags and distances, see for a starting point:
     # https://benchmark-urbanism.github.io/cityseer-examples/examples/graph_cleaning.html#manual-cleaning
