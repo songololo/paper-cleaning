@@ -5,6 +5,7 @@ temp
 *.gpkg-wal
 *.aux.xml
 uv.lock
+cache
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
