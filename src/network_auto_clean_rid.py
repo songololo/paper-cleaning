@@ -30,24 +30,33 @@ for osm_fid, location_key in [
     bounds_buff = bounds.buffer(buffer_dist).union_all()
 
     # Fetch the road network using Cityseer's I/O tools
-    # Recommend version 4.16.10 (or newer) for latest cleaning workflow
+    # Recommend version 4.16.12 (or newer) for latest cleaning workflow
     # The idea is then to further edit the network manually as required
     # The workflow can be customised to target specific OSM highway tags and distances, see for a starting point:
     # https://benchmark-urbanism.github.io/cityseer-examples/examples/graph_cleaning.html#manual-cleaning
     # (Happy to help based on what you're trying to achieve?)
-    nx_raw = io.osm_graph_from_poly(
-        bounds_buff.simplify(500),  # Simplify the buffered geometry to reduce complexity
+    nx_graph = io.osm_graph_from_poly(
+        bounds_buff.simplify(500),
         poly_crs_code=WORKING_CRS,  # CRS of the input polygon
         to_crs_code=WORKING_CRS,  # CRS to which the output graph should be reprojected
-        simplify=True,  # Simplify the graph geometry
+        simplify=True,  # Simplify the graph
+        final_clean_distances=(  # distances to use for final consolidation steps
+            6,
+            12,
+        ),  # don't go too aggressive - i.e. be careful with more than 12m
+        remove_disconnected=100,  # disconnected clusters with fewer than 100 nodes removed
+        cycleways=True,  # include cycleways - more convoluted but necessary otherwise important connections missed
+        busways=False,  # don't include busways
+        green_footways=True,  # can be removed manually from QGIS with associated tag
+        green_service_roads=False,  # drop service roads in green spaces (and cemetries etc.)
     )
     # Convert the fetched road network into a GeoDataFrame
-    edges_gdf = io.geopandas_from_nx(nx_raw, crs=WORKING_CRS)
+    edges_gdf = io.geopandas_from_nx(nx_graph, crs=WORKING_CRS)
     # Save the road network to a GeoPackage file, named after the location key
-    # By default, Motorways and Trunk Roads are left alone by cleaning
-    # The output network can be filtered in QGIS by highway type based on your needs
-    # e.g. remove footway types for motorised network
-    # e.g. remove motorways and trunk roads for pedestrian
-    # Footways and service roads intersecting green areas are specially tagged and left alone when cleaning
-    # But you may want to remove these before running centrality measures by dropping footway_green and service_green
     edges_gdf.to_file(f"{location_key}_auto_clean.gpkg")
+    # By default, Motorways are left alone by cleaning
+    # The output network can be filtered in QGIS by highway type based on your needs
+    # e.g. remove footway and cycleway types for motorised network
+    # e.g. remove motorways and trunk roads for pedestrian
+    # Footways intersecting green areas are specially tagged and left alone when cleaning
+    # But you may want to remove these before running centrality measures by dropping footway_green
