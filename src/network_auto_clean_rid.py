@@ -30,7 +30,7 @@ for osm_fid, location_key in [
     bounds_buff = bounds.buffer(buffer_dist).union_all()
 
     # Fetch the road network using Cityseer's I/O tools
-    # Recommend version 4.16.27 (or newer) for latest cleaning workflow
+    # Recommend version 4.17.0 (or newer) for latest cleaning workflow
     # The idea is then to further edit the network manually as required
     # The workflow can be customised to target specific OSM highway tags and distances, see for a starting point:
     # https://benchmark-urbanism.github.io/cityseer-examples/examples/graph_cleaning.html#manual-cleaning
@@ -53,7 +53,7 @@ for osm_fid, location_key in [
     # Convert the fetched road network into a GeoDataFrame
     edges_gdf = io.geopandas_from_nx(nx_graph, crs=WORKING_CRS)
     # Save the road network to a GeoPackage file, named after the location key
-    edges_gdf.to_file(f"{location_key}_auto_clean_v3.gpkg")
+    edges_gdf.to_file(f"{location_key}_auto_clean_v4.gpkg")
     # By default, Motorways are left alone by cleaning
     # The output network can be filtered in QGIS by highway type based on your needs
     # e.g. remove footway and cycleway types for motorised network
